@@ -11,7 +11,10 @@ export default function Home() {
   const dispatch = useDispatch()
 
   useEffect(()=>{
-    dispatch(whichCategoryIsSelected("all"))
+    if(!localStorage.getItem("category")){
+      dispatch(whichCategoryIsSelected("all"))
+    }
+   
   },[])
   
   if(itemsBasedOnCategory?.length === 0){

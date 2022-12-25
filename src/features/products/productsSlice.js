@@ -33,21 +33,31 @@ const initialState = {
     products: productsData.data.categories,
     categoryNames: getUniqueCategories(productsData.data.categories),
     currencyNames: getUniqueCurrencies(productsData.data.categories),
-    itemsBasedOnCategory: [],
-    amount: 0,
-    total: 0,
-    cartItems: [],
-    cartItemSelectedOptions: [],
+    itemsBasedOnCategory: localStorage.getItem("category") ? JSON.parse(localStorage.getItem("category")) : [],
+    // controls navbar green border
+    navbarIndex: localStorage.getItem("navbarIndex") ? JSON.parse(localStorage.getItem("navbarIndex")) : 0,
+    
+    amount: localStorage.getItem("amount") ? JSON.parse(localStorage.getItem("amount")) : 0,
+    total: localStorage.getItem("total") ? JSON.parse(localStorage.getItem("total")) : 0,
+
+
+    cartItems: localStorage.getItem("cartItems") ? JSON.parse(localStorage.getItem("cartItems")) : [],
+    cartItemSelectedOptions: localStorage.getItem("cartItemSelectedOptions") ?
+     JSON.parse(localStorage.getItem("cartItemSelectedOptions")) : [],
    //before adding to cart
-    beforeCartSelectedOptions: [],
-    isCartOpen: false,
+    beforeCartSelectedOptions: localStorage.getItem("beforeCartSelectedOptions") ?
+    JSON.parse(localStorage.getItem("beforeCartSelectedOptions")) : [],
+    isCartOpen: localStorage.getItem("isCartOpen") ? JSON.parse(localStorage.getItem("isCartOpen")) : false ,
     isExchangeOpen: false,
-    tempProd: [],
+    // storing images of products which are in Cart
+    tempProd: localStorage.getItem("tempProd") ? JSON.parse(localStorage.getItem("tempProd")) :[],
+    // if product is not in cart yet, and you are veiwing it in single product page
     singleProductNotInCart: [],
+    // if product is in cart yet, and you are veiwing it in single product page
     singleProductInCart: [],
-    // manipulating single page pictures
-    imgIndex:0,
-    currencyIndex: 0,
+    // manipulating single page imgs
+    imgIndex: 0,
+    currencyIndex: localStorage.getItem("currency") ? JSON.parse(localStorage.getItem("currency")) : 0,
     
 
 }
@@ -61,22 +71,36 @@ const productsSlice = createSlice({
             let tempItems = state.products;
             let singleCategoryItems;
             
+
             if(action.payload !== "all"){
                 
                  singleCategoryItems = tempItems.map((element)=> element.products.filter((item)=> item.category === action.payload));
                 singleCategoryItems = singleCategoryItems.filter((element)=> Math.max(element.length))
                 state.itemsBasedOnCategory = singleCategoryItems;
-
+                
+                
             }else{
                 
                 singleCategoryItems = tempItems.map((element)=> element.products.map((item)=> item)); 
                 state.itemsBasedOnCategory = singleCategoryItems;
+                localStorage.setItem("navbarIndex",JSON.stringify(0));
+
             }
+            // LocalStorage for Category 
+            localStorage.setItem("category",JSON.stringify(state.itemsBasedOnCategory));
              
         },
        whichCurrencyIsSelected: (state,action) => {
             state.currencyIndex = action.payload.i;
             state.isExchangeOpen = !state.isExchangeOpen;
+            
+            // LocalStorage
+            localStorage.setItem("currency",JSON.stringify(state.currencyIndex));
+       },
+       handleNavbarChange: (state,action) => {
+        state.navbarIndex = action.payload.i
+        localStorage.setItem("navbarIndex",JSON.stringify(state.navbarIndex));
+
        },
         calculateTotal: (state,action) => {
             let tempAmount = 0;
@@ -87,7 +111,13 @@ const productsSlice = createSlice({
         })
 
         state.amount = tempAmount;
+        localStorage.setItem("amount",JSON.stringify(state.amount))
         state.total = tempTotal;
+        //localStorage.setItem("amountAndTotal",JSON.stringify([state.amount,state.total]))
+
+        localStorage.setItem("total",JSON.stringify(state.total))
+
+
         },
        
         addToCart: (state,action) => {
@@ -102,16 +132,21 @@ const productsSlice = createSlice({
             tempCartItem = state.itemsBasedOnCategory[0].find((item) =>  item.id === action.payload.id);
             tempCartItem = {...tempCartItem, amount:1}
             state.cartItems = [...state.cartItems,tempCartItem];
+            // Adding Cart item LocalStorage
+            localStorage.setItem("cartItems",JSON.stringify(state.cartItems));
+
             // add options to 
             if(state.beforeCartSelectedOptions.length > 0){
-                state.cartItemSelectedOptions = [...state.beforeCartSelectedOptions];
+                state.cartItemSelectedOptions = [...state.cartItemSelectedOptions,...state.beforeCartSelectedOptions];
+                // adding Item feature options to LocalStorage
+                localStorage.setItem("cartItemSelectedOptions",JSON.stringify(state.cartItemSelectedOptions));
             }
             
         }
     
         },
         selectCartOptions: (state, action) => {
-            //console.log(action.payload);
+            // selects cart options when added 
 
             const selectedOptions = {
                 id: action.payload.id,
@@ -122,12 +157,12 @@ const productsSlice = createSlice({
 
             const productInCart = state.cartItems.find((product)=> product.id === action.payload.productName);
             
-            //console.log(productInCart)
-           
+          
            if(productInCart === undefined){
-                // this means that unOrder product from singleProduct page.
+                // this means that unOrdered product from singleProduct page.
                 if(state.beforeCartSelectedOptions?.length === 0){
                     state.beforeCartSelectedOptions = [...state.beforeCartSelectedOptions, selectedOptions];
+
                 }else{
                    // if product is not still in cart && product's id(the value, 42 for shoe) has changed
                     const updated = state.beforeCartSelectedOptions.find((item)=> {
@@ -137,19 +172,21 @@ const productsSlice = createSlice({
                     });
                     
                     if(updated === undefined){
+                        // adding new features , size, color
                         state.beforeCartSelectedOptions = [... state.beforeCartSelectedOptions,selectedOptions];
-    
+                    
                     }else{ 
+                        // updating feature values, size, color
                         updated.id = selectedOptions.id;
                     }
                     
                 }
 
             }
-           
+        //    when item is in cart' and 
             else if(state.cartItemSelectedOptions?.length === 0 && state.cartItems.find((product)=> product.name === selectCartOptions.productName)){
-                // if cart has items and select some options.
                state.cartItemSelectedOptions = [...state.cartItemSelectedOptions,selectedOptions];
+
             }else{
 
                 const shouldUpdate = state.cartItemSelectedOptions.find((item)=> {
@@ -159,10 +196,16 @@ const productsSlice = createSlice({
                 });
                 if(shouldUpdate === undefined){
                     state.cartItemSelectedOptions = [...state.cartItemSelectedOptions,selectedOptions];
-
+                   
                 }else{ 
                     shouldUpdate.id = selectedOptions.id;
                 }
+
+                    
+                
+
+                 //localStorage
+               localStorage.setItem("cartItemSelectedOptions",JSON.stringify(state.cartItemSelectedOptions));
 
             }
     },
@@ -181,6 +224,7 @@ const productsSlice = createSlice({
        if(shouldAdd === undefined && action.payload.move === "initial"){
         singleItem.initialIndex = 0;
         state.tempProd = [...state.tempProd,singleItem]
+
        }
    
        else{
@@ -202,13 +246,16 @@ const productsSlice = createSlice({
            // state.tempProd = [...state.tempProd,singleItem]
         }
        }
-    
+
+       
+       localStorage.setItem("tempProd",JSON.stringify(state.tempProd));
         
     },
 
     changeSinglePageImg: (state,action) => {
         //console.log(action.payload)
         state.imgIndex = action.payload.i
+      
     },
 
     inCart: (state,action) => {
@@ -221,6 +268,7 @@ const productsSlice = createSlice({
         if(product){
             if( state.singleProductInCart?.length > 0){
                 state.singleProductInCart = [];
+                
                 state.imgIndex = 0;
             }
                 state.singleProductInCart = [...state.singleProductInCart,product];
@@ -232,8 +280,6 @@ const productsSlice = createSlice({
         }else{
             // if not in Cart scenario
 
-            // if product is in `cart` and you are product which are not in the `cart` you have to 
-            // remove it from array. otherwise. product which is in the cart will be renderred.
             state.imgIndex = 0;
             state.singleProductInCart = [];
             
@@ -245,7 +291,7 @@ const productsSlice = createSlice({
                 product = state.itemsBasedOnCategory[0].find((item)=> item.id === action.payload.id);
                 state.singleProductNotInCart = [...state.singleProductNotInCart, product]
             }else if(state.singleProductNotInCart?.length > 0 && state.singleProductNotInCart[0].id !== action.payload.id){
-                // measn new product
+                // means new product
                 
                 product = state.itemsBasedOnCategory[0].find((item)=> item.id === action.payload.id);
 
@@ -259,7 +305,6 @@ const productsSlice = createSlice({
         }
 
 
-
     },
  
       
@@ -269,6 +314,7 @@ const productsSlice = createSlice({
                 state.isExchangeOpen = !state.isExchangeOpen;
             }
             state.isCartOpen = !state.isCartOpen;
+            localStorage.setItem("isCartOpen",JSON.stringify(state.isCartOpen));
         },
 
         setExchangeOpen: (state,action) => {
@@ -294,6 +340,10 @@ const productsSlice = createSlice({
                 }
                
             }
+            localStorage.setItem("cartItems",JSON.stringify(state.cartItems))
+            localStorage.setItem("cartItemSelectedOptions",JSON.stringify(state.cartItemSelectedOptions));
+            localStorage.setItem("tempProd",JSON.stringify(state.tempProd));
+
         },
         
     }
@@ -301,7 +351,7 @@ const productsSlice = createSlice({
 });
 
 
-export const {whichCategoryIsSelected,addToCart,setCartOpen,toggle,calculateTotal,selectCartOptions, setCartImage,inCart,changeSinglePageImg,setExchangeOpen,whichCurrencyIsSelected} = productsSlice.actions;
+export const {whichCategoryIsSelected,addToCart,setCartOpen,toggle,calculateTotal,selectCartOptions, setCartImage,inCart,changeSinglePageImg,setExchangeOpen,whichCurrencyIsSelected,handleNavbarChange} = productsSlice.actions;
 
 
 export default productsSlice.reducer;

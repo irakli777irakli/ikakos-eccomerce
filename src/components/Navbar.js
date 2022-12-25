@@ -4,15 +4,15 @@ import {AiOutlineDollar,AiOutlineDown,AiOutlineShoppingCart} from 'react-icons/a
 import {GiBowlSpiral} from 'react-icons/gi'
 // redux stuff
 import { useSelector, useDispatch } from 'react-redux'
-import {whichCategoryIsSelected,setCartOpen, calculateTotal,setExchangeOpen} from '../features/products/productsSlice'
+import {whichCategoryIsSelected,setCartOpen, calculateTotal,setExchangeOpen,handleNavbarChange} from '../features/products/productsSlice'
 
 import Cart from './Cart'
 import Exchange from './Exchange'
 
 export default function Navbar() {
     
-    const {amount, categoryNames,isCartOpen,cartItems,currencyNames,currencyIndex,isExchangeOpen} = useSelector((store) => store.products);
-    const [selectedCategory,setSelectedCategory] = useState(0);
+    const {amount, categoryNames,isCartOpen,cartItems,currencyNames,
+        currencyIndex,isExchangeOpen,navbarIndex} = useSelector((store) => store.products);
     const dispatch = useDispatch();
     const navigate = useNavigate()
     
@@ -28,7 +28,7 @@ export default function Navbar() {
                 <ul>
                     {categoryNames.map((category,i)=>{
                         return (
-                        <li key={i} className={selectedCategory === i ? "active_category" : ""} onClick={()=> {setSelectedCategory(i); dispatch(whichCategoryIsSelected(category)); navigate("/")}}>
+                        <li key={i} className={navbarIndex === i ? "active_category" : ""} onClick={()=> {dispatch(handleNavbarChange({i})); dispatch(whichCategoryIsSelected(category)); navigate("/")}}>
                             {category.toUpperCase()}      
                         </li>
                         )
