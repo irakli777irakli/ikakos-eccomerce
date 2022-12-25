@@ -146,7 +146,7 @@ export default function CartLogic({mainCart}) {
                      </div>
                      
      
-                     <div className='cart-l'>
+                     <div className='cart-l notMainCart'>
                      <div className='increase-decrease'>
                          <button className='single-attribute' onClick={()=> dispatch(toggle({incdec:"inc",productId:id}))}>+</button>
                          <p>{amount}</p>

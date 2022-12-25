@@ -114,7 +114,7 @@ export default function SingleProductUi({singleItemInCart}) {
                                  <p style={{fontWeight:"600",fontSize:"1.2rem",fontFamily:"Ubuntu"}}>{prices[currencyIndex].currency.symbol} {prices[currencyIndex].amount}</p>
                                  {itemInCart ? null: <button className='checkout' onClick={() => {dispatch(addToCart({id}));  dispatch(setCartImage({gallery,move:"initial",id}))  }}>ADD TO CART</button>}
                                  {/* properly format text (</p>) */}
-                                 {properSlice(description)}
+                                 <p className="product-desc">{properSlice(description)}</p>
                              </div>
         
         
