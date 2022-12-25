@@ -59,6 +59,7 @@ const initialState = {
     imgIndex: 0,
     currencyIndex: localStorage.getItem("currency") ? JSON.parse(localStorage.getItem("currency")) : 0,
     
+    wrongItemName: false,
 
 }
 
@@ -266,6 +267,7 @@ const productsSlice = createSlice({
         product = state.cartItems.find((item)=> item.id === action.payload.id);
 
         if(product){
+            state.wrongItemName = false;
             if( state.singleProductInCart?.length > 0){
                 state.singleProductInCart = [];
                 
@@ -289,10 +291,15 @@ const productsSlice = createSlice({
                 
                 
                 product = state.itemsBasedOnCategory[0].find((item)=> item.id === action.payload.id);
+                if(product === undefined){
+                    state.wrongItemName = true;
+                    return ;
+                }
+                state.wrongItemName = false;
                 state.singleProductNotInCart = [...state.singleProductNotInCart, product]
             }else if(state.singleProductNotInCart?.length > 0 && state.singleProductNotInCart[0].id !== action.payload.id){
                 // means new product
-                
+                state.wrongItemName = false;
                 product = state.itemsBasedOnCategory[0].find((item)=> item.id === action.payload.id);
 
                 // before removing item from `singleProductNotInCart`, you have to also remove

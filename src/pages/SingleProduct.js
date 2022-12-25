@@ -1,17 +1,16 @@
 import React, { useEffect } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux';
 import {inCart,selectCartOptions,whichCategoryIsSelected} from '../features/products/productsSlice'
 import SingleProductUi from '../components/SingleProductUi'
 
 
-
 export default function SingleProduct() {
-
+  const navigate = useNavigate()
   const {id} = useParams();
   const dispatch = useDispatch()
 
-  const {products,itemsBasedOnCategory,cartItems,singleProductNotInCart,singleProductInCart,cartItemSelectedOptions,beforeCartSelectedOptions} = useSelector((store) => store.products);
+  const {products,itemsBasedOnCategory,cartItems,singleProductNotInCart,singleProductInCart,cartItemSelectedOptions,beforeCartSelectedOptions,wrongItemName} = useSelector((store) => store.products);
 
  
   
@@ -28,6 +27,10 @@ export default function SingleProduct() {
     
     
   },[])
+
+ if(wrongItemName){
+  navigate("*")
+ }
   return (
 
     <section className='single-product-init'>

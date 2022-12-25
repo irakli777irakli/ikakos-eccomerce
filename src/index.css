@@ -572,6 +572,8 @@ hr{
   font-weight: 500;
   font-family: "Ubuntu",sans-serif;
   font-size: 1.1rem;
+  padding: 0 1rem 0 1rem;
+
 }
 
 .mainCart-l{
@@ -671,12 +673,13 @@ hr{
 }
 .single-product-img-collection-wrapper{
  flex:1;
-  width: 40%;
+  
   display: flex;
   align-items:center;
   justify-content: center;
   gap: 1rem;
-  flex-direction: column;
+  
+  flex-wrap: wrap;
 }
 .one-of-the-img-from-collections{
   width: 25%;
