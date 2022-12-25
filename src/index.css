@@ -291,6 +291,7 @@
   gap: 5rem;
   flex-direction: column;
   position: absolute;
+  top:100%;
   right: 2%;
   width: 18rem;
   height: 14rem;
