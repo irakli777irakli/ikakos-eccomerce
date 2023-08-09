@@ -1,4 +1,23 @@
-# Getting Started with Create React App
+
+# Ecommerce store frontend
+
+This is the Scandiweb's junior React developer Task written with React and Redux Toolkit.
+
+
+
+
+## Features
+
+- Add & Remove Items From Cart
+- Product Gallery & Ability to choose product options
+- Currency Convertersion available 
+- Dynaimic Price Calculations
+- Local Storage for data persistancy
+
+
+## Demo
+
+https://ikakos-eccomerce.vercel.app/
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
